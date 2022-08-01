@@ -29,13 +29,12 @@ const updateUserCredential = async (req, res, next) => {
     const { inputUsername, inputFullname, inputBio } = req.body;
 
     const findSameUsername = await user.findOne({
-      where: { user_id },
+      where: { username: inputUsername },
     });
 
-    if (
-      findSameUsername &&
-      findSameUsername.dataValues.username != inputUsername
-    ) {
+    console.log({ findSameUsername });
+
+    if (findSameUsername) {
       throw {
         code: 400,
         message: "Username already exist",
@@ -50,9 +49,6 @@ const updateUserCredential = async (req, res, next) => {
     });
     const resUpdateProfileCredential = await editUser.save();
 
-    // console.log({ resUpdateProfileCredential });
-    // console.log(findSameUserrsname);
-
     res.send({
       status: "Success",
       message: "Success update profile credential",
@@ -61,34 +57,9 @@ const updateUserCredential = async (req, res, next) => {
       },
     });
   } catch (error) {
-    // console.log(error.errors[0].message);
-    // console.log(error.message);
     next(error);
   }
 };
-
-// Error
-//     at Query.run (C:\Users\Wicked Wench\Documents\GitHub\GeneralRepo\Project\Arizonna\Api\node_modules\sequelize\lib\dialects\mysql\query.js:52:25)
-//     at C:\Users\Wicked Wench\Documents\GitHub\GeneralRepo\Project\Arizonna\Api\node_modules\sequelize\lib\sequelize.js:311:28
-//     at processTicksAndRejections (node:internal/process/task_queues:96:5)
-//     at async MySQLQueryInterface.update (C:\Users\Wicked Wench\Documents\GitHub\GeneralRepo\Project\Arizonna\Api\node_modules\sequelize\lib\dialects\abstract\query-interface.js:355:12)
-//     at async users.save (C:\Users\Wicked Wench\Documents\GitHub\GeneralRepo\Project\Arizonna\Api\node_modules\sequelize\lib\model.js:2432:35)
-//     at async users.update (C:\Users\Wicked Wench\Documents\GitHub\GeneralRepo\Project\Arizonna\Api\node_modules\sequelize\lib\model.js:2534:12)
-//     at async updateUserCredential (C:\Users\Wicked Wench\Documents\GitHub\GeneralRepo\Project\Arizonna\Api\src\routers\user\patch.user.js:34:5) {
-//   name: 'SequelizeUniqueConstraintError',
-//   errors: [
-//     ValidationErrorItem {
-//       message: 'username must be unique',
-//       type: 'unique violation',
-//       path: 'username',
-//       value: 'abcdef',
-//       origin: 'DB',
-//       instance: [user],
-//       validatorKey: 'not_unique',
-//       validatorName: null,
-//       validatorArgs: []
-//     }
-//   ]
 
 router.patch(
   "/avatar",

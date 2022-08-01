@@ -6,7 +6,11 @@ async function auth(req, res, next) {
   try {
     const token = req.token;
 
-    console.log({ authAtJWTHelper: typeof token, token });
+    console.log({
+      authStatus: "Running",
+      authAtJWTHelper: typeof token,
+      token,
+    });
 
     const verifiedToken = verifyToken(token);
 

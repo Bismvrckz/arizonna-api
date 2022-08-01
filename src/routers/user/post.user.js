@@ -142,6 +142,8 @@ const userLogin = async (req, res, next) => {
       where: { [Op.or]: { username: usernameOrEmail, email: usernameOrEmail } },
     });
 
+    console.log({ resGetUser });
+
     if (!resGetUser) {
       throw {
         code: 404,
