@@ -34,7 +34,7 @@ const updateUserCredential = async (req, res, next) => {
 
     console.log({ findSameUsername });
 
-    if (findSameUsername) {
+    if (findSameUsername && findSameUsername.dataValues.user_id != user_id) {
       throw {
         code: 400,
         message: "Username already exist",

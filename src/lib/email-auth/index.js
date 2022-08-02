@@ -16,7 +16,7 @@ const mailCourier = nodemailer.createTransport({
 
 const sendVerificationMail = async ({ email, username, token }) => {
   const mail = {
-    from: "Arizonna verification <ahmadfayruzsyamil33@gmail.com>",
+    from: "Arizonna Team <ahmadfayruzsyamil33@gmail.com>",
     to: email,
     subject: "Arizonna email verify",
     html: `<!DOCTYPE html>
@@ -73,4 +73,31 @@ const sendVerificationMail = async ({ email, username, token }) => {
   }
 };
 
-module.exports = { sendVerificationMail };
+const sendPasswordRecoveryMail = async ({ email }) => {
+  const mail = {
+    from: "Arizonna Team <ahmadfayruzsyamil33@gmail.com>",
+    to: email,
+    subject: "Arizonna password recovery",
+    html: `<!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+      </head>
+      <body>
+        <p>password recovery</p>
+      </body>
+    </html>`,
+  };
+
+  try {
+    await mailCourier.sendMail(mail);
+    console.log(`Password recovery  mail sent for ${email}`);
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = { sendVerificationMail, sendPasswordRecoveryMail };
