@@ -1,16 +1,19 @@
-const { sendVerificationMail } = require("../../lib/email-auth");
+const {
+  sendVerificationMail,
+  sendPasswordRecoveryMail,
+} = require("../../lib/email-auth");
 const taiPasswordStrength = require("tai-password-strength");
 const { hash, compare } = require("../../lib/bcryptjs");
+const { Verification } = require("../../../models");
 const { createToken } = require("../../lib/token");
 const { fieldIsEmpty } = require("../../helpers");
 const validator = require("email-validator");
-const { Verification } = require("../../../models");
 const { user } = require("../../../models");
 const { Op } = require("sequelize");
 const express = require("express");
 const router = express.Router();
 
-const userRegister = async (req, res, next) => {
+const userRegisterController = async (req, res, next) => {
   try {
     const { username, email, password, confirmPassword } = req.body;
 
@@ -134,7 +137,7 @@ const userRegister = async (req, res, next) => {
   }
 };
 
-const userLogin = async (req, res, next) => {
+const userLoginController = async (req, res, next) => {
   try {
     const { usernameOrEmail, password } = req.body;
 
@@ -204,7 +207,7 @@ const userLogin = async (req, res, next) => {
   }
 };
 
-const userResendVerificationMail = async (req, res, next) => {
+const userResendVerificationMailController = async (req, res, next) => {
   try {
     const { username, email } = req.body.user.dataValues;
     const { user_id } = req.body;
@@ -237,8 +240,31 @@ const userResendVerificationMail = async (req, res, next) => {
   }
 };
 
-router.post("/register", userRegister);
-router.post("/login", userLogin);
-router.post("/resendVerificationMail", userResendVerificationMail);
+const sendPasswordRecoveryMailController = async (req, res, next) => {
+  try {
+    const { emailInput } = req.body;
+
+    const foundUser = await user.findOne({ where: { email: emailInput } });
+
+    if (foundUser) {
+      sendPasswordRecoveryMail({ email: emailInput });
+      res.send({
+        status: "success",
+        message: "success send recovery mail",
+      });
+    } else {
+      throw {
+        message: "User not found",
+      };
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+router.post("/resendVerificationMail", userResendVerificationMailController);
+router.post("/recoverPassword", sendPasswordRecoveryMailController);
+router.post("/register", userRegisterController);
+router.post("/login", userLoginController);
 
 module.exports = router;
