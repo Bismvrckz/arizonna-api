@@ -7,6 +7,7 @@ const { hash, compare } = require("../../lib/bcryptjs");
 const { Verification } = require("../../../models");
 const { createToken } = require("../../lib/token");
 const { fieldIsEmpty } = require("../../helpers");
+const { auth } = require("../../helpers/auth");
 const validator = require("email-validator");
 const { user } = require("../../../models");
 const { Op } = require("sequelize");
@@ -246,8 +247,14 @@ const sendPasswordRecoveryMailController = async (req, res, next) => {
 
     const foundUser = await user.findOne({ where: { email: emailInput } });
 
+    const token = createToken(foundUser.dataValues);
+
     if (foundUser) {
-      sendPasswordRecoveryMail({ email: emailInput });
+      sendPasswordRecoveryMail({
+        email: emailInput,
+        token,
+        username: foundUser.dataValues.username,
+      });
       res.send({
         status: "success",
         message: "success send recovery mail",

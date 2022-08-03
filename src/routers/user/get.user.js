@@ -4,7 +4,6 @@ const { verifyToken } = require("../../lib/token");
 const { auth } = require("../../helpers/auth");
 const { Verification } = require("../../../models");
 const { user } = require("../../../models");
-const { Op } = require("sequelize");
 
 const getUser = async (req, res, next) => {
   try {
@@ -125,7 +124,20 @@ const userVerificationHandler = async (req, res, next) => {
   }
 };
 
+const getUserWithToken = async (req, res, next) => {
+  try {
+    res.send({
+      status: "Success",
+      message: "Get user with token",
+      user: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 router.get("/verify/:token", userVerificationHandler);
+router.get("/userWithToken", auth, getUserWithToken);
 router.get("/:user_id", auth, getUser);
 
 module.exports = router;

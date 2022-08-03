@@ -73,7 +73,7 @@ const sendVerificationMail = async ({ email, username, token }) => {
   }
 };
 
-const sendPasswordRecoveryMail = async ({ email }) => {
+const sendPasswordRecoveryMail = async ({ email, token, username }) => {
   const mail = {
     from: "Arizonna Team <ahmadfayruzsyamil33@gmail.com>",
     to: email,
@@ -87,7 +87,8 @@ const sendPasswordRecoveryMail = async ({ email }) => {
         <title>Document</title>
       </head>
       <body>
-        <p>password recovery</p>
+        <p>Hi ${username}</p>
+        <p>Plase click this <a href="http://localhost:3000/resetPassword/${token}">link</a> to recover your password</p>
       </body>
     </html>`,
   };
