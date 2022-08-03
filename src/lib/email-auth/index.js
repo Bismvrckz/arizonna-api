@@ -53,7 +53,7 @@ const sendVerificationMail = async ({ email, username, token }) => {
   
         <a href="http://localhost:2000/users/verify/${token}" target="_blank"
         class="bg-blue-500 h-[3rem] my-[1vh] w-[15vw] text-[1.2rem] rounded-[1vh]"
-      > Verify Account
+      > Verify Account</a>
         
       </div>
       <p class="text-[2rem]">Thank you for joining arizonna</p>

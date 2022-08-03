@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Verification.belongsTo(models.user, {
         foreignKey: "user_id",
-        as: "userVerification",
+        as: "userVerifications",
       });
     }
   }
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BIGINT,
         allowNull: false,
         references: {
-          model: "user",
+          model: "users",
           key: "user_id",
         },
       },

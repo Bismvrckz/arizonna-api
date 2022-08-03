@@ -5,6 +5,7 @@ const {
 const taiPasswordStrength = require("tai-password-strength");
 const { hash, compare } = require("../../lib/bcryptjs");
 const { Verification } = require("../../../models");
+const { passwordrecovery } = require("../../../models");
 const { createToken } = require("../../lib/token");
 const { fieldIsEmpty } = require("../../helpers");
 const { auth } = require("../../helpers/auth");
@@ -46,9 +47,8 @@ const userRegisterController = async (req, res, next) => {
 
     const strengthTester = new taiPasswordStrength.PasswordStrength();
     const results = strengthTester.check(password);
-    const { number, upper, symbol, passwordLength } = results.charsets;
-    // console.log(password);
-    // console.log(results);
+    const { number, upper, symbol } = results.charsets;
+    const { passwordLength } = results;
 
     if (!number || !upper || !symbol || passwordLength < 8) {
       throw {
@@ -247,14 +247,24 @@ const sendPasswordRecoveryMailController = async (req, res, next) => {
 
     const foundUser = await user.findOne({ where: { email: emailInput } });
 
-    const token = createToken(foundUser.dataValues);
-
     if (foundUser) {
+      const recovery_id = `${
+        foundUser.dataValues.username
+      }-recovery-${new Date().getTime()}`;
+
+      await passwordrecovery.create({
+        user_id: foundUser.dataValues.user_id,
+        recovery_id,
+      });
+
+      const token = createToken({ user: foundUser.dataValues, recovery_id });
+
       sendPasswordRecoveryMail({
         email: emailInput,
         token,
         username: foundUser.dataValues.username,
       });
+
       res.send({
         status: "success",
         message: "success send recovery mail",

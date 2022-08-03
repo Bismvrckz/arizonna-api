@@ -3,6 +3,8 @@ const router = express.Router();
 const { user } = require("../../../models");
 const { auth } = require("../../helpers/auth");
 const { uploadAvatar } = require("../../lib/multer");
+const taiPasswordStrength = require("tai-password-strength");
+const { hash } = require("../../lib/bcryptjs");
 
 const updateUserProfilePicture = async (req, res, next) => {
   try {
@@ -61,6 +63,55 @@ const updateUserCredential = async (req, res, next) => {
   }
 };
 
+const updateUserPassword = async (req, res, next) => {
+  try {
+    const { password, confirmPassword } = req.body;
+    const { user_id } = req.params;
+
+    const strengthTester = new taiPasswordStrength.PasswordStrength();
+    const results = strengthTester.check(password);
+    const { number, upper, symbol } = results.charsets;
+    const { passwordLength } = results;
+    console.log({ passwordLength });
+
+    if (!number || !upper || !symbol || passwordLength < 8) {
+      throw {
+        code: 400,
+        message:
+          "Passwords should contain at least 8 characters including an uppercase letter, a symbol, and a number.",
+        detail: { password },
+        errorType: "password",
+      };
+    }
+
+    if (password != confirmPassword) {
+      throw {
+        code: 400,
+        message: "Password does not match",
+        detail: `Password: ${password}, Confirm Password: ${confirmPassword}`,
+        errorType: "confirmPassword",
+      };
+    }
+
+    const resFindUser = await user.findOne({ where: { user_id } });
+
+    const passwordEncrypt = hash(password);
+
+    await resFindUser.update({
+      user_password: passwordEncrypt,
+    });
+    const resUpdatePassword = await resFindUser.save();
+
+    res.send({
+      status: "Success",
+      message: "Success update password",
+      detail: { resUpdatePassword },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 router.patch(
   "/avatar",
   auth,
@@ -68,5 +119,6 @@ router.patch(
   updateUserProfilePicture
 );
 router.patch("/userCredential", auth, updateUserCredential);
+router.patch("/updatePassword/:user_id", updateUserPassword);
 
 module.exports = router;

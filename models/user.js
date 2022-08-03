@@ -16,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
       });
       users.hasMany(models.Verification, {
         foreignKey: "user_id",
-        as: "userVerification",
+        as: "userVerifications",
+      });
+      users.hasMany(models.passwordrecovery, {
+        foreignKey: "user_id",
+        as: "userRecoveries",
       });
     }
   }
