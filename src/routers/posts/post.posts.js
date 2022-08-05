@@ -52,12 +52,13 @@ const getPostDetail = async (req, res, next) => {
       ],
     });
 
-    console.log({ resGetUserPosts });
+    const fullCommentsLength = await comment.findAll({ where: { post_id } });
 
     res.send({
       status: "Success",
       message: "Get post detail",
       detail: resGetUserPosts,
+      fullCommentsLength,
     });
   } catch (error) {
     next(error);
